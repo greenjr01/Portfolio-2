@@ -45,6 +45,36 @@ string lower_text(string text)
     return text;
 }
 
+bool is_number(string text)
+{
+    if (text.length() == 0)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < text.length(); i++)
+    {
+        if (!isdigit(static_cast<unsigned char>(text[i])))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int string_to_int(string text)
+{
+    int value = 0;
+
+    for (int i = 0; i < text.length(); i++)
+    {
+        value = value * 10 + (text[i] - '0');
+    }
+
+    return value;
+}
+
 Position direction_step(char direction)
 {
     if (direction == '^')
@@ -188,7 +218,6 @@ private:
     Position player;
     Position goal;
     vector<unique_ptr<Guard>> guards;
-
     vector<bool> door_open;
 
 public:
@@ -392,10 +421,6 @@ private:
                     if (door_open[group])
                     {
                         display[row][col] = ' ';
-                    }
-                    else
-                    {
-                        display[row][col] = cell;
                     }
                 }
             }
@@ -656,18 +681,37 @@ private:
         }
     }
 
+    bool read_number_input(string prompt, int& value) const
+    {
+        string text;
+
+        cout << prompt;
+        getline(cin, text);
+
+        if (!is_number(text))
+        {
+            cout << "Invalid number." << endl;
+            return false;
+        }
+
+        value = string_to_int(text);
+        return true;
+    }
+
     void inspect_tile() const
     {
         int row;
         int col;
 
-        cout << "Enter row: ";
-        cin >> row;
+        if (!read_number_input("Enter row: ", row))
+        {
+            return;
+        }
 
-        cout << "Enter column: ";
-        cin >> col;
-
-        cin.ignore(1000, '\n');
+        if (!read_number_input("Enter column: ", col))
+        {
+            return;
+        }
 
         Position inspected(row, col);
 
